@@ -1,8 +1,8 @@
 TARGET := libhook.so
-OBJS := main.o
+OBJS := main.o subop_check.o
 CC := gcc
 LDFLAGS := -ldl 
-CFLAGS := $(CFLAGS) -fPIC -shared -D_GNU_SOURCE
+CFLAGS := $(CFLAGS) -Wall -fPIC -shared -D_GNU_SOURCE
 
 $(TARGET): $(OBJS)
 	    $(CC) $(CFLAGS) $^ -o$@ $(LDFLAGS)
