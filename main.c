@@ -8,7 +8,7 @@
 
 #include "subop_check.h"
 
-#define HOOK_LOG_FILE "/home/matt/hook.log"
+#define HOOK_LOG_FILE "/tmp/hook.log"
 
 /*************************types***********************************************/
 //pmemobj
