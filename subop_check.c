@@ -126,18 +126,21 @@ gint compare_values (gconstpointer val1, gconstpointer val2)
 
 void init_dirty_alloc_tree()
 {
+    if(dirty_alloc_tree != NULL)
+        g_tree_destroy(dirty_alloc_tree);
     dirty_alloc_tree = g_tree_new(compare_values);
 }
 
 void destroy_dirty_alloc_tree()
 {
-    g_tree_destroy(dirty_alloc_tree);
+    if(dirty_alloc_tree != NULL)
+        g_tree_destroy(dirty_alloc_tree);
 }
 
 void append_dirty_alloc_tree()
 {
     void *alloc_p;
-    sscanf(prev_call.params,"%*p %p %*s", &alloc_p);
+    sscanf(curr_call.params,"%*p %p %*s", &alloc_p);
     g_tree_insert (dirty_alloc_tree, alloc_p, alloc_p);
 }
 

@@ -48,6 +48,8 @@ void reset_structures()
     memset(curr_call.params, 0x00, 255);
     prev_call.command = NULL;
     memset(prev_call.params, 0x00, 255);
+    destroy_dirty_alloc_tree();
+    init_dirty_alloc_tree();
 }
 
 /*************************TESTS*********************************************/
@@ -79,16 +81,63 @@ void NEGATIVE_check_for_free_after_alloc()
         printf("NEGATIVE check_for_free_after_alloc: PASS\n");
 }
 
+void POSITIVE_check_for_dirty_alloc()
+{
+    reset_structures();
+    sprintf(curr_call.params,"%p %p %zu %u %p %p", (void*)0x11, (void*)0x24, (size_t)50, 30, (void *)0x24, (void*)0x27);
+    append_dirty_alloc_tree();
+    sprintf(curr_call.params,"%p %p %zu %u %p %p", (void*)0x11, (void*)0x25, (size_t)50, 30, (void *)0x24, (void*)0x27);
+    append_dirty_alloc_tree();
+    sprintf(curr_call.params,"%p %p %zu %u %p %p", (void*)0x11, (void*)0x26, (size_t)50, 30, (void *)0x24, (void*)0x27);
+    append_dirty_alloc_tree();
+
+    sprintf(curr_call.params,"%p", (void*)0x25);
+    int result = check_for_dirty_alloc();
+    if(result == 0)
+        printf("POSITIVE check_for_dirty_alloc: PASS\n");
+    else
+        printf("POSITIVE check_for_dirty_alloc: FAIL\n");
+}
+
+void NEGATIVE_check_for_dirty_alloc()
+{
+    reset_structures();
+
+    reset_structures();
+    sprintf(curr_call.params,"%p %p %zu %u %p %p", (void*)0x11, (void*)0x24, (size_t)50, 30, (void *)0x24, (void*)0x27);
+    append_dirty_alloc_tree();
+    sprintf(curr_call.params,"%p %p %zu %u %p %p", (void*)0x11, (void*)0x25, (size_t)50, 30, (void *)0x24, (void*)0x27);
+    append_dirty_alloc_tree();
+    sprintf(curr_call.params,"%p %p %zu %u %p %p", (void*)0x11, (void*)0x26, (size_t)50, 30, (void *)0x24, (void*)0x27);
+    append_dirty_alloc_tree();
+
+    sprintf(curr_call.params,"%p %p %zu %u", (void*)0x11, (void*)0x25, (size_t)50, 30);
+    find_n_mark_alloc_as_ok();
+
+    sprintf(curr_call.params,"%p", (void*)0x25);
+    int result = check_for_dirty_alloc();
+    if(result == 0)
+        printf("POSITIVE check_for_dirty_alloc: FAIL\n");
+    else
+        printf("POSITIVE check_for_dirty_alloc: PASS\n");
+
+}
+
 
 int main()
 {
     logFile = fopen(HOOK_LOG_FILE, "a+");
     init_functions_pointers();
     reset_structures();
+    init_dirty_alloc_tree();
 
     POSITIVE_check_for_free_after_alloc();
     NEGATIVE_check_for_free_after_alloc();
 
+    POSITIVE_check_for_dirty_alloc();
+    NEGATIVE_check_for_dirty_alloc();
+
+    destroy_dirty_alloc_tree();
     fsync(fileno(logFile));
     fclose(logFile);
 }
