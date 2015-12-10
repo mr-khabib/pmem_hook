@@ -48,6 +48,7 @@ __attribute__((constructor)) void _lib_init__ ()
     memset(curr_call.params, 0x00, 255);
     prev_call.command = NULL;
     memset(prev_call.params, 0x00, 255);
+    init_dirty_alloc_tree();
     logFile = fopen(HOOK_LOG_FILE, "a+");
 }
 
@@ -55,6 +56,7 @@ __attribute__((destructor)) void _lib_deinit__ ()
 {
     fsync(fileno(logFile));
     fclose(logFile);
+    destroy_dirty_alloc_tree();
 }
 
 
