@@ -1,4 +1,5 @@
 ﻿#include <string.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <glib.h>
 
@@ -106,14 +107,19 @@ int check_for_dirty_alloc()
 
     if(result != NULL)
     {
-        fprintf(logFile, "**Warning** detected unused allocation oidp %p \n", this_free_p);
-        g_tree_remove(dirty_alloc_tree, this_free_p);
-        return 0;
+        dirty_alloc_data_t *data;
+        data = (dirty_alloc_data_t *) result;
+        if(data->read_cnt == 0)
+        {
+            fprintf(logFile, "**Warning** detected unused allocation oidp %p \n", this_free_p);
+            g_tree_remove(dirty_alloc_tree, this_free_p);
+            return 0;
+        }
     }
     return -1;
 }
 
-gint compare_values (gconstpointer val1, gconstpointer val2)
+gint compare_values (gconstpointer val1, gconstpointer val2, gpointer user_data)
 {
     if(val1 < val2)
         return -1;
@@ -124,29 +130,57 @@ gint compare_values (gconstpointer val1, gconstpointer val2)
     return 0;
 }
 
+void free_value(gpointer data)
+{
+    dirty_alloc_data_t *dirty_data = (dirty_alloc_data_t*)data;
+    free(dirty_data);
+}
+
 void init_dirty_alloc_tree()
 {
     if(dirty_alloc_tree != NULL)
+    {
         g_tree_destroy(dirty_alloc_tree);
-    dirty_alloc_tree = g_tree_new(compare_values);
+    }
+    dirty_alloc_tree = g_tree_new_full(compare_values, NULL, NULL, free_value);
 }
 
 void destroy_dirty_alloc_tree()
 {
     if(dirty_alloc_tree != NULL)
+    {
         g_tree_destroy(dirty_alloc_tree);
+        dirty_alloc_tree = NULL;
+    }
 }
 
 void append_dirty_alloc_tree()
 {
+    if(dirty_alloc_tree == NULL) return;
     void *alloc_p;
     sscanf(curr_call.params,"%*p %p %*s", &alloc_p);
-    g_tree_insert (dirty_alloc_tree, alloc_p, alloc_p);
+    dirty_alloc_data_t *alloc_data;
+    alloc_data = (dirty_alloc_data_t*)malloc(sizeof(dirty_alloc_data_t));
+    if(alloc_data != NULL)
+    {
+        alloc_data->alloc_oidp = alloc_p;
+        alloc_data->read_cnt = 0;
+        g_tree_insert(dirty_alloc_tree, alloc_p, alloc_data);
+    }
 }
 
 void find_n_mark_alloc_as_ok()
 {
+    if(dirty_alloc_tree == NULL) return;
     void *realloc_p;
     sscanf(curr_call.params, "%*p %p", &realloc_p);
-    g_tree_remove(dirty_alloc_tree, realloc_p);
+
+    gpointer result = g_tree_lookup (dirty_alloc_tree, realloc_p);
+
+    if(result != NULL)
+    {
+        dirty_alloc_data_t *data;
+        data = (dirty_alloc_data_t *) result;
+        data->read_cnt++;
+    }
 }

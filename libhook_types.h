@@ -31,4 +31,9 @@ typedef int     (*_pmem_msync_t)(void *addr, size_t len);
 typedef void   *(*_pmem_map_t)(int fd);
 typedef int     (*_pmem_unmap_t)(void *addr, size_t len);
 
+typedef struct {
+    void *alloc_oidp;
+    int read_cnt;
+} dirty_alloc_data_t;
+
 #endif //hook_utils.h

@@ -62,9 +62,9 @@ void POSITIVE_check_for_free_after_alloc()
     sprintf(curr_call.params,"%p", (void*)0x22);
     int result = check_for_free_after_alloc();
     if(result == 0)
-        printf("POSITIVE check_for_free_after_alloc: PASS\n");
+        printf("POSITIVE check_for_free_after_alloc: \tPASS\n");
     else
-        printf("POSITIVE check_for_free_after_alloc: FAIL\n");
+        printf("POSITIVE check_for_free_after_alloc: \tFAIL\n");
 }
 
 void NEGATIVE_check_for_free_after_alloc()
@@ -76,9 +76,9 @@ void NEGATIVE_check_for_free_after_alloc()
     sprintf(curr_call.params,"%p", (void*)0x22);
     int result = check_for_free_after_alloc();
     if(result == 0)
-        printf("NEGATIVE check_for_free_after_alloc: FAIL\n");
+        printf("NEGATIVE check_for_free_after_alloc: \tFAIL\n");
     else
-        printf("NEGATIVE check_for_free_after_alloc: PASS\n");
+        printf("NEGATIVE check_for_free_after_alloc: \tPASS\n");
 }
 
 void POSITIVE_check_for_dirty_alloc()
@@ -90,19 +90,16 @@ void POSITIVE_check_for_dirty_alloc()
     append_dirty_alloc_tree();
     sprintf(curr_call.params,"%p %p %zu %u %p %p", (void*)0x11, (void*)0x26, (size_t)50, 30, (void *)0x24, (void*)0x27);
     append_dirty_alloc_tree();
-
     sprintf(curr_call.params,"%p", (void*)0x25);
     int result = check_for_dirty_alloc();
     if(result == 0)
-        printf("POSITIVE check_for_dirty_alloc: PASS\n");
+        printf("POSITIVE check_for_dirty_alloc: \tPASS\n");
     else
-        printf("POSITIVE check_for_dirty_alloc: FAIL\n");
+        printf("POSITIVE check_for_dirty_alloc: \tFAIL\n");
 }
 
 void NEGATIVE_check_for_dirty_alloc()
 {
-    reset_structures();
-
     reset_structures();
     sprintf(curr_call.params,"%p %p %zu %u %p %p", (void*)0x11, (void*)0x24, (size_t)50, 30, (void *)0x24, (void*)0x27);
     append_dirty_alloc_tree();
@@ -117,9 +114,9 @@ void NEGATIVE_check_for_dirty_alloc()
     sprintf(curr_call.params,"%p", (void*)0x25);
     int result = check_for_dirty_alloc();
     if(result == 0)
-        printf("POSITIVE check_for_dirty_alloc: FAIL\n");
+        printf("POSITIVE check_for_dirty_alloc: \tFAIL\n");
     else
-        printf("POSITIVE check_for_dirty_alloc: PASS\n");
+        printf("POSITIVE check_for_dirty_alloc: \tPASS\n");
 
 }
 
