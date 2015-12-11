@@ -1,7 +1,11 @@
 # pmem_hook
 
+external dependencies: glib 2.0
+
 build:
-Just "make"
+make
+build and run tests:
+make test
 
 To check if it works:
 update testconfig.sh with TEST_LD_PRELOAD=\<PathTo\>/libhook.so and run tests
