@@ -4,6 +4,7 @@ external dependencies: glib 2.0
 
 build:
 make
+
 build and run tests:
 make test
 
